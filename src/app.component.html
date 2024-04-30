@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual Hosts Management</title>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJS61IpMNLxy8tOoViKm8DOhqCwTRLX2OwzRW9uAxA5SNx8z5tWtGSdB" crossorigin="anonymous">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/angular/14.0.0/fesm2015/angular.min.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ngx-pagination/dist/ngx-pagination.css">
+
+  <style>
+    /* Main Container */
+    .container {
+      max-width: 800px; /* Optional: Set a maximum width for the table */
+      margin: 20px auto; /* Center the table horizontally */
+    }
+
+    /* Table Styles */
+    .virtual-hosts-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .virtual-hosts-table thead th {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .virtual-hosts-table tbody td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    /* Sorting Icons */
+    .material-icons {
+      font-size: 18px;
+      vertical-align: middle;
+      color: #ccc;
+    }
+
+    .material-icons.active {
+      color: #007bff;
+    }
+
+    /* Loading Indicator */
+    .loading {
+      text-align: center;
+      padding: 20px;
+    }
+
+    /* Pagination */
+    .ngx-pagination {
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    /* Optional: Responsive Design */
+    @media (max-width: 768px) {
+      .virtual-hosts-table {
+        font-size: 14px; /* Adjust font size for smaller screens */
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Virtual Hosts</h1>
+
+    <table class="virtual-hosts-table">
+      <thead>
+        <tr>
+          <th scope="col">
+            <a href="#" [queryParams]="{ sort: 'domain', order: sortOrder === 'domain' ? (sortOrder === 'asc' ? 'desc' : 'asc') : 'asc' }">
+              Domain
+              <span class="material-icons" *ngIf="sortOrder === 'domain'">
+                keyboard_arrow_up
+                <span class="material-icons active" *ngIf="sortOrder === 'domain' && sortOrder === 'asc'"></span>
+                <span class="material-icons active" *ngIf="sortOrder === 'domain' && sortOrder === 'desc'"></span>
+              </span>
+            </a>
+          </th>
+          <th scope="col">
+            <a href="#" [queryParams]="{ sort: 'ipAddress', order: sortOrder === 'ipAddress' ? (sortOrder === 'asc' ? 'desc' : 'asc') : 'asc' }">
+              IP Address
+              <span class="material-icons" *ngIf="sortOrder === 'ipAddress'">
+                keyboard_arrow_up
+                <span class="material-icons active" *ngIf="sortOrder === 'ipAddress' && sortOrder === 'asc'"></span>
+                <span class="material-icons active" *ngIf="sortOrder === 'ipAddress' && sortOrder === 'desc'"></span>
+              </span>
+            </a>
+          </th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="!isLoading && virtualHosts.length === 0">
+          <td colspan="3">No virtual hosts found.</td>
+        </tr>
+        <tr *ngIf="isLoading">
+          <td colspan="3" class="loading">
+            <span class="material-icons">refresh</span> Loading...
+          </td>
+        </tr>
+        <tr *ngFor="let virtualHost of virtualHosts | paginate: { itemsPerPage: 10, currentPage: currentPage }">
+          <td>{{ virtualHost.domain }}</td>
+          <td>{{ virtualHost.ipAddress }}</td>
+          <td>
+            <a href="#" class="btn btn-primary" *ngIf="virtualHost.isActive">Edit</a>
+            <a href="#" class="btn btn-danger" *ngIf="!virtualHost.isActive">Deactivate</a>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr *ngIf="virtualHosts.length > 10">
+          <td colspan="3">
+            <ngx-pagination [totalItems]="totalVirtualHosts" [itemsPerPage]="10" (pageChange)="onPageChange($event)"></ngx-pagination>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</body>
+</html>
